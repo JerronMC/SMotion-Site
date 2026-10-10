@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101014">
+  <meta name="description" content="SMotion — a free, browser-based video and photo editor.">
+  <title>SMotion Studio</title>
+  <link rel="icon" href="assets/smotion-icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="SMotion home"><img src="assets/smotion-icon.svg" alt=""/><span>SMotion</span><small>STUDIO</small></a>
+      <div class="project-name-wrap"><span class="status-dot"></span><input id="projectName" value="Untitled project" aria-label="Project name" maxlength="80"></div>
+      <div class="top-actions">
+        <button id="newProjectBtn" class="btn ghost">＋ New</button>
+        <button id="saveProjectBtn" class="btn ghost">▣ Save</button>
+        <button id="openProjectsBtn" class="btn ghost">Projects</button>
+        <button id="exportProjectBtn" class="btn ghost">Export XML</button>
+        <button id="exportVideoBtn" class="btn primary">Export video ↗</button>
+        <button id="profileBtn" class="profile-btn" title="Local profile">G</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="left-rail" aria-label="Editing tools">
+        <button class="tool active" data-tool="media"><span>▧</span><small>Media</small></button>
+        <button class="tool" data-tool="audio"><span>♫</span><small>Audio</small></button>
+        <button class="tool" data-tool="text"><span>T</span><small>Text</small></button>
+        <button class="tool" data-tool="stickers"><span>✦</span><small>Stickers</small></button>
+        <button class="tool" data-tool="effects"><span>✳</span><small>Effects</small></button>
+        <button class="tool" data-tool="adjust"><span>◒</span><small>Adjust</small></button>
+        <button class="tool" data-tool="crop"><span>⌗</span><small>Canvas</small></button>
+        <button class="tool" data-tool="captions"><span>▤</span><small>Captions</small></button>
+      </aside>
+
+      <aside class="asset-panel" id="assetPanel">
+        <div class="panel-heading"><div><h2 id="panelTitle">Your media</h2><p id="panelSub">Import videos, photos and audio</p></div><button id="collapsePanelBtn" class="icon-btn" aria-label="Collapse panel">‹</button></div>
+        <div class="panel-content" id="panelContent">
+          <div class="import-drop" id="dropZone">
+            <div class="upload-symbol">↑</div>
+            <strong>Bring your ideas in</strong>
+            <p>MP4, WebM, MOV, PNG, JPG, MP3, WAV and more</p>
+            <button id="importBtn" class="btn primary full">＋ Import media</button>
+            <button id="browseTemplatesBtn" class="btn ghost full" style="margin-top:7px">✦ Browse templates</button>
+            <input id="mediaInput" type="file" accept="video/*,image/*,audio/*" multiple hidden>
+          </div>
+          <div class="section-row"><span>PROJECT MEDIA</span><span id="mediaCount">0 items</span></div>
+          <div id="mediaList" class="media-list"><div class="empty-state">Your imported media will appear here.</div></div>
+          <div class="tip-card"><span>✦</span><div><b>Local by design</b><p>Your media stays in this browser. Nothing is uploaded to a server.</p></div></div>
+        </div>
+      </aside>
+
+      <section class="editor-area">
+        <div class="editor-toolbar">
+          <div class="breadcrumb"><span>Workspace</span><i>/</i><b id="currentModeLabel">Media</b></div>
+          <div class="toolbar-actions">
+            <button id="undoBtn" class="icon-btn" title="Undo (Ctrl/Cmd+Z)" aria-label="Undo">↶</button>
+            <button id="redoBtn" class="icon-btn" title="Redo (Ctrl/Cmd+Shift+Z)" aria-label="Redo">↷</button>
+            <span class="toolbar-sep"></span>
+            <button id="fitPreviewBtn" class="icon-btn" title="Fit preview">⤢</button>
+            <span class="zoom-label" id="zoomLabel">Fit</span>
+          </div>
+        </div>
+
+        <div class="stage-wrap">
+          <div class="stage" id="stage">
+            <canvas id="previewCanvas" width="1280" height="720" aria-label="Media preview"></canvas>
+            <video id="sourceVideo" playsinline preload="metadata" hidden></video>
+            <audio id="sourceAudio" preload="metadata" hidden></audio>
+            <div id="previewEmpty" class="preview-empty">
+              <img src="assets/smotion-icon.svg" alt="SMotion logo">
+              <h2>Make something move.</h2><p>Import a video or photo to start editing.</p>
+              <button class="btn primary" id="emptyImportBtn">Import media</button>
+            </div>
+            <div class="stage-badges"><span id="resolutionBadge">16:9 · 720p</span><span id="playbackBadge">PREVIEW</span></div>
+          </div>
+        </div>
+
+        <div class="playback-controls">
+          <div class="time-readout"><strong id="currentTimeLabel">00:00.00</strong><span>/</span><span id="durationLabel">00:00.00</span></div>
+          <div class="transport">
+            <button id="backFrameBtn" class="transport-btn" title="Back 1 second">−1s</button>
+            <button id="playBtn" class="play-button" title="Play / pause">▶</button>
+            <button id="forwardFrameBtn" class="transport-btn" title="Forward 1 second">+1s</button>
+            <button id="freezeBtn" class="transport-btn" title="Freeze at current frame">❄ Freeze</button>
+          </div>
+          <div class="playback-right"><span class="live-dot"></span><span>Live preview</span></div>
+        </div>
+        <div class="scrub-row"><input type="range" id="scrubSlider" min="0" max="1" value="0" step="0.01" aria-label="Scrub timeline"><div class="scrub-ticks"><span>00:00</span><span id="scrubEndLabel">00:00</span></div></div>
+
+        <section class="timeline-panel">
+          <div class="timeline-header">
+            <div class="timeline-title"><h3>Timeline</h3><span id="timelineDuration">00:00</span></div>
+            <div class="timeline-actions">
+              <button id="splitBtn" class="btn small ghost">✂ Split</button>
+              <button id="duplicateBtn" class="btn small ghost">▣ Duplicate</button>
+              <button id="replaceBtn" class="btn small ghost">⇄ Replace</button>
+              <button id="deleteBtn" class="btn small danger-ghost">⌫ Delete</button>
+              <button id="timelineZoomOut" class="icon-btn" aria-label="Zoom timeline out">−</button><button id="timelineZoomIn" class="icon-btn" aria-label="Zoom timeline in">＋</button>
+            </div>
+          </div>
+          <div class="timeline-ruler"><span>00:00</span><span>00:05</span><span>00:10</span><span>00:15</span><span>00:20</span><span>00:25</span></div>
+          <div class="timeline-scroller" id="timelineScroller">
+            <div class="track-labels"><div>VIDEO</div><div>AUDIO</div><div>TEXT / OVERLAY</div></div>
+            <div class="tracks" id="tracks">
+              <div class="track video-track" id="videoTrack"><div class="track-empty">Import media to build your timeline</div></div>
+              <div class="track audio-track" id="audioTrack"></div>
+              <div class="track overlay-track" id="overlayTrack"></div>
+              <div class="playhead" id="playhead"><div></div></div>
+            </div>
+          </div>
+          <div class="timeline-footer"><span><kbd>Space</kbd> Play / pause</span><span><kbd>Ctrl</kbd>+<kbd>Z</kbd> Undo</span><span id="selectedClipLabel">No clip selected</span></div>
+        </section>
+      </section>
+
+      <aside class="inspector" id="inspector">
+        <div class="panel-heading"><div><h2>Inspector</h2><p id="inspectorSubtitle">Selected clip settings</p></div><button id="resetSettingsBtn" class="text-btn">Reset</button></div>
+        <div class="inspector-content" id="inspectorContent">
+          <div class="no-selection"><div class="selection-icon">◈</div><h3>Choose a clip</h3><p>Select a media clip in the timeline to adjust its properties.</p></div>
+        </div>
+      </aside>
+    </main>
+    <footer class="bottom-bar"><span><span class="brand-mini">S</span> SMotion Studio <span class="version">WEB BETA</span></span><span id="saveStatus">Ready · projects save on this device</span><span>Free · No ads · Browser-based</span></footer>
+  </div>
+
+  <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+  <div class="modal-backdrop hidden" id="modalBackdrop">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header"><div><h2 id="modalTitle">Export video</h2><p id="modalSub">Choose your export settings.</p></div><button id="modalCloseBtn" class="icon-btn" aria-label="Close dialog">×</button></div>
+      <div id="modalBody" class="modal-body"></div>
+      <div id="modalFooter" class="modal-footer"></div>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
